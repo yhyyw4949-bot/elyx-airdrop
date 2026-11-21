@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ELYX Airdrop</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="wrap">
+    <header>
+      <h1 id="title">Airdrop</h1>
+      <p id="phase-banner" class="phase-banner"></p>
+    </header>
+
+    <section id="card-whitelist" class="card" hidden>
+      <h2>Phase 1 · Whitelist</h2>
+      <p id="whitelist-status" class="muted"></p>
+    </section>
+
+    <section id="card-tasks" class="card" hidden>
+      <h2>Phase 2 · Earn points</h2>
+      <p id="tasks-locked" class="muted" hidden>This phase is for whitelist members only.</p>
+      <ul class="tasks" id="tasks-list">
+        <li id="task-channel">
+          <span class="check">⬜</span>
+          <div class="task-body">
+            <strong>Join the Telegram channel</strong>
+            <div class="row">
+              <a id="channel-link" class="btn small" target="_blank">Open channel</a>
+              <button id="verify-channel" class="btn small primary">Verify</button>
+            </div>
+          </div>
+        </li>
+        <li id="task-group" hidden>
+          <span class="check">⬜</span>
+          <div class="task-body">
+            <strong>Join the Telegram group</strong>
+            <div class="row">
+              <a id="group-link" class="btn small" target="_blank">Open group</a>
+            </div>
+          </div>
+        </li>
+        <li id="task-x">
+          <span class="check">⬜</span>
+          <div class="task-body">
+            <strong>Follow us on X</strong>
+            <div class="row">
+              <a id="x-link" class="btn small" target="_blank">Open X</a>
+              <button id="confirm-x" class="btn small primary">I followed</button>
+            </div>
+          </div>
+        </li>
+        <li id="task-wallet">
+          <span class="check">⬜</span>
+          <div class="task-body">
+            <strong>Connect your TON wallet</strong>
+            <div id="ton-connect"></div>
+            <p id="wallet-address" class="muted mono" hidden></p>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <section id="card-referrals" class="card" hidden>
+      <h2>Your referrals</h2>
+      <p><span id="points">0</span> points · <span id="referrals">0</span> referrals</p>
+      <div class="row">
+        <input id="ref-link" class="mono" readonly />
+        <button id="copy-ref" class="btn small">Copy</button>
+      </div>
+      <p class="muted" id="ref-hint"></p>
+    </section>
+
+    <section id="card-conversion" class="card" hidden>
+      <h2>Phase 3 · Token conversion</h2>
+      <p>Your <span id="conv-points">0</span> points become</p>
+      <p class="big" id="conv-tokens">0 ELYX</p>
+      <p class="muted" id="conv-rate"></p>
+    </section>
+
+    <section id="card-airdrop" class="card" hidden>
+      <h2>Phase 4 · Airdrop</h2>
+      <p class="big" id="airdrop-tokens">0 ELYX</p>
+      <p id="airdrop-status" class="muted"></p>
+    </section>
+
+    <a id="admin-link" class="admin-link" href="/admin.html" hidden>Admin panel</a>
+    <p id="toast" class="toast" hidden></p>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

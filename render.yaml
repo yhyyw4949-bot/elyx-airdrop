@@ -1,0 +1,36 @@
+# Render.com blueprint: deploys the ELYX airdrop bot + Mini App.
+# Create with: Render dashboard -> New -> Blueprint -> pick this repo.
+services:
+  - type: web
+    name: elyx-bot
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    envVars:
+      - key: BOT_TOKEN
+        sync: false          # paste the token from @BotFather in the Render dashboard
+      - key: WEBAPP_URL
+        sync: false          # set to https://<your-service>.onrender.com
+      - key: ADMIN_IDS
+        sync: false          # your Telegram user ID, comma-separated
+      - key: CHANNEL_USERNAME
+        value: "@your_channel"
+      - key: X_PROFILE_URL
+        value: "https://x.com/your_handle"
+      - key: TOKEN_NAME
+        value: "ELYX"
+      - key: POINTS_PER_REFERRAL
+        value: "10"
+      - key: POINTS_PER_TOKEN
+        value: "1"
+      - key: WHITELIST_AUTO_APPROVE
+        value: "true"
+      - key: DB_PATH
+        value: "/var/data/airdrop.db"
+      - key: PORT
+        value: "10000"       # Render routes to this port
+    disk:
+      name: elyx-data
+      mountPath: /var/data
+      sizeGB: 1
