@@ -4,23 +4,29 @@ Runs an airdrop campaign on Telegram: users open your Mini App, join your channe
 
 ## Features
 
-- Telegram Mini App (web app inside Telegram) with task checklist and TON Connect wallet linking
+- Telegram Mini App (web app inside Telegram) with task checklist and TON Connect wallet linking, single page for users and admins
 - `/start` welcome message with referral support (`t.me/<yourbot>?start=ref_<user_id>`)
-- Tasks:
+- Flexible task system (Telegram joins, X follow, wallet connect, custom tasks):
   - Join your Telegram channel (verified automatically via Telegram's API; optional second group)
-  - Follow your X/Twitter account (user confirms with a tap)
+  - Follow your X/Twitter account (manual confirm, or verified through the X API when `X_BEARER_TOKEN` + `X_TARGET_USERNAME` are set)
   - Connect a TON wallet via TON Connect (address validated with a configurable regex)
-- Personal referral link per user, points per referral
-- Signed Telegram initData validation on every API call, so users can't fake their identity
-- Admin commands in the bot chat: `/stats`, `/broadcast`, `/export` (CSV of users, wallets and referral counts)
+  - Points, participant caps, and ordering per task; managed from the admin panel
+- Personal referral link per user, points per referral, referral history and leaderboard; optional verification-gated crediting (`REFERRAL_REQUIRES_VERIFIED`)
+- Immutable points ledger: every balance change is recorded with a reason; balances can't go negative
+- Withdrawal workflow: users request ELYX withdrawals (points locked), admins approve/reject/mark paid; rejections release the points. All transitions are idempotent
+- Signed Telegram initData validation on every API call (with replay protection), so users can't fake their identity
+- Admin panel inside the Mini App: stats, phase control, whitelist approvals, withdrawal review, member search, ban/unban, balance adjustments with reasons, task management, broadcasts, audit log, CSV export
+- Admin commands in the bot chat: `/stats`, `/phase`, `/whitelist`, `/approve`, `/broadcast`, `/export`
 - All campaign settings (channel, X link, token name, points, wallet format) read from environment variables
+- Tests for registration, referrals, tasks, withdrawals, admin auth and the ledger (`pytest tests/`)
 
 ## How it's organized
 
 - `app.py` - bot handlers + FastAPI backend (one process runs both)
 - `config.py` - environment-based settings
-- `db.py` - SQLite storage
+- `db.py` - SQLite storage (users, tasks, completions, referrals, points ledger, withdrawals, audit log)
 - `webapp/` - the Mini App frontend (HTML/JS/CSS, uses the TON Connect UI from a CDN)
+- `tests/` - pytest suite for the API and storage layer
 - `requirements.txt`, `.env.example`
 
 ## Setup
@@ -74,6 +80,11 @@ Edit `.env` and fill in:
 | `PORT` | Port the web app listens on (default `8000`) |
 | `WHITELIST_AUTO_APPROVE` | `true` auto-joins everyone to the whitelist in phase 1; `false` means you approve with `/approve` |
 | `POINTS_PER_TOKEN` | How many points convert to 1 ELYX in phase 3 |
+| `REFERRAL_REQUIRES_VERIFIED` | `true` credits a referral only after the invited user verifies the channel task |
+| `INIT_DATA_MAX_AGE` | Max age of the Telegram session in seconds (default 86400; 0 disables) |
+| `MIN_WITHDRAWAL_TOKENS` | Smallest withdrawal request, in ELYX (default 100) |
+| `WITHDRAWALS_OPEN_PHASE` | Phase withdrawals open in (default 4) |
+| `X_BEARER_TOKEN`, `X_TARGET_USERNAME` | Optional: verify X follows through the X API instead of manual confirm |
 
 ### 6. Run it
 
@@ -98,7 +109,7 @@ All of these are also in the admin panel (see below).
 
 ## Admin panel
 
-Admins (IDs in `ADMIN_IDS`) get an "Admin panel" link inside the Mini App, at `/admin.html`. It shows campaign stats, phase control buttons, the pending whitelist with approve buttons, the member list with points and ELYX allocations, and a CSV export. It is gated by the same signed Telegram initData check, so only your admin accounts can open it. The bot chat commands (`/phase`, `/whitelist`, `/approve`, `/stats`, `/export`) keep working too.
+Admins (IDs in `ADMIN_IDS`) get an "Admin" toggle inside the Mini App (single page: Airdrop view / Admin view). It shows campaign stats, phase control buttons, the pending whitelist with approve buttons, the withdrawal queue (approve / reject / mark paid), member search with ban/unban and balance adjustments, task management (add, edit, disable, delete), broadcasts, an audit log of admin actions, and a CSV export. It is gated by the same signed Telegram initData check, so only your admin accounts can open it. The bot chat commands (`/phase`, `/whitelist`, `/approve`, `/stats`, `/export`) keep working too.
 
 ## Campaign phases
 
@@ -157,8 +168,18 @@ sudo systemctl enable --now airdrop-bot caddy
 
 Set `WEBAPP_URL=https://airdrop.example.com` in `.env` and register that URL with BotFather.
 
+## Tests
+
+```bash
+pip install -r requirements.txt pytest
+python -m pytest tests/
+```
+
+Covers initData validation (bad signature, expired session), registration, referral crediting (once-only, self-referral), task claims (duplicates, wrong phase, channel verification), wallet validation, the full withdrawal lifecycle (min amount, locking, one pending per user, cancel/reject release, approve/complete idempotency), admin authorization, balance adjustments and the ledger.
+
 ## Notes
 
-- The X follow can't be verified from Telegram's side, so users confirm it with a tap. Channel membership is verified for real through the Bot API.
+- The X follow can't be verified from Telegram's side; without X API credentials users confirm it with a tap. Set `X_BEARER_TOKEN` and `X_TARGET_USERNAME` to verify follows for real. Channel membership is always verified for real through the Bot API.
+- Withdrawals are reviewed and paid by you (off-chain): the app locks the member's points at request time and releases them on rejection. Nothing moves on-chain by itself.
 - TON Connect needs `icon.png` in the `webapp/` folder for the wallet popup; add any square PNG.
 - If you switch chains, change `WALLET_PATTERN` in `.env` and replace the TON Connect button in `webapp/index.html` / `app.js` with a plain address input.
