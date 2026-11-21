@@ -22,13 +22,13 @@ def load_dotenv(path: str = ".env") -> None:
 
 load_dotenv()
 
-BOT_TOKEN = os.getenv("BOT_TOKEN", "")
+BOT_TOKEN = os.getenv("BOT_TOKEN", "").strip()
 if not BOT_TOKEN:
     raise SystemExit("BOT_TOKEN is not set. Copy .env.example to .env and fill it in.")
 
 # Public HTTPS URL where this app is hosted, e.g. https://airdrop.example.com
 # Required: Telegram Mini Apps only open over HTTPS.
-WEBAPP_URL = os.getenv("WEBAPP_URL", "https://your-domain.example")
+WEBAPP_URL = os.getenv("WEBAPP_URL", "https://your-domain.example").strip().rstrip("/")
 
 ADMIN_IDS = {
     int(x.strip())
@@ -36,11 +36,19 @@ ADMIN_IDS = {
     if x.strip().isdigit()
 }
 
-CHANNEL_USERNAME = os.getenv("CHANNEL_USERNAME", "@your_channel")  # channel to join
-GROUP_USERNAME = os.getenv("GROUP_USERNAME", "")                    # optional group, "" to skip
-X_PROFILE_URL = os.getenv("X_PROFILE_URL", "https://x.com/your_handle")
-TOKEN_NAME = os.getenv("TOKEN_NAME", "ELYX")
+CHANNEL_USERNAME = os.getenv("CHANNEL_USERNAME", "@your_channel").strip()  # channel to join
+GROUP_USERNAME = os.getenv("GROUP_USERNAME", "").strip()                    # optional group, "" to skip
+X_PROFILE_URL = os.getenv("X_PROFILE_URL", "https://x.com/your_handle").strip()
+TOKEN_NAME = os.getenv("TOKEN_NAME", "ELYX").strip() or "ELYX"
 POINTS_PER_REFERRAL = int(os.getenv("POINTS_PER_REFERRAL", "10"))
+
+# A referral is credited to the referrer either when the invited user joins
+# (false) or only after the invited user verifies the channel task (true).
+REFERRAL_REQUIRES_VERIFIED = os.getenv("REFERRAL_REQUIRES_VERIFIED", "false").lower() in {"1", "true", "yes"}
+LEADERBOARD_SIZE = int(os.getenv("LEADERBOARD_SIZE", "10"))
+
+# Telegram WebApp initData max age in seconds (replay protection). 0 disables the check.
+INIT_DATA_MAX_AGE = int(os.getenv("INIT_DATA_MAX_AGE", "86400"))
 
 # --- Wallet address validation --------------------------------------------------
 # Default: TON (user-friendly mainnet addresses, UQ.../EQ...).
@@ -58,3 +66,18 @@ PORT = int(os.getenv("PORT", "8000"))
 # phase 1; set it to false to review each member yourself with /whitelist and /approve.
 WHITELIST_AUTO_APPROVE = os.getenv("WHITELIST_AUTO_APPROVE", "true").lower() in {"1", "true", "yes"}
 POINTS_PER_TOKEN = int(os.getenv("POINTS_PER_TOKEN", "1"))  # how many points make 1 ELYX
+
+# --- Withdrawals ----------------------------------------------------------------
+# Users can request a withdrawal of their ELYX tokens once the campaign reaches
+# WITHDRAWALS_OPEN_PHASE. MIN_WITHDRAWAL_TOKENS is the smallest allowed request.
+# Withdrawals are reviewed by an admin in the panel: approving locks the tokens,
+# rejecting/cancelling releases them, completing marks the payout as sent.
+MIN_WITHDRAWAL_TOKENS = int(os.getenv("MIN_WITHDRAWAL_TOKENS", "100"))
+WITHDRAWALS_OPEN_PHASE = int(os.getenv("WITHDRAWALS_OPEN_PHASE", "4"))
+
+# --- X (Twitter) follow verification ---------------------------------------------
+# Optional. When X_BEARER_TOKEN and X_TARGET_USERNAME are set, the "Follow on X"
+# task is verified through the X API (the user enters their X username).
+# Without credentials the task falls back to a manual "I followed" confirmation.
+X_BEARER_TOKEN = os.getenv("X_BEARER_TOKEN", "").strip()
+X_TARGET_USERNAME = os.getenv("X_TARGET_USERNAME", "").strip().lstrip("@")
