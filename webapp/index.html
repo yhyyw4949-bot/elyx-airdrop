@@ -10,17 +10,22 @@
 </head>
 <body>
   <main class="wrap">
-    <header>
-      <h1 id="title">Airdrop</h1>
-      <p id="phase-banner" class="phase-banner"></p>
+    <header class="brand">
+      <span class="mark">E</span>
+      <h1 id="title">ELYX Airdrop</h1>
+      <p class="tagline">Complete the tasks to qualify, then invite friends for points.</p>
+      <div class="phase-banner-wrap">
+        <span id="phase-banner" class="phase-banner"></span>
+      </div>
+      <div id="phase-steps" class="phase-steps"></div>
     </header>
 
-    <section id="card-whitelist" class="card" hidden>
+    <section class="card" id="card-whitelist" hidden>
       <h2>Phase 1 · Whitelist</h2>
       <p id="whitelist-status" class="muted"></p>
     </section>
 
-    <section id="card-tasks" class="card" hidden>
+    <section class="card" id="card-tasks" hidden>
       <h2>Phase 2 · Earn points</h2>
       <p id="tasks-locked" class="muted" hidden>This phase is for whitelist members only.</p>
       <ul class="tasks" id="tasks-list">
@@ -64,7 +69,7 @@
       </ul>
     </section>
 
-    <section id="card-referrals" class="card" hidden>
+    <section class="card" id="card-referrals" hidden>
       <h2>Your referrals</h2>
       <p><span id="points">0</span> points · <span id="referrals">0</span> referrals</p>
       <div class="row">
@@ -74,14 +79,14 @@
       <p class="muted" id="ref-hint"></p>
     </section>
 
-    <section id="card-conversion" class="card" hidden>
+    <section class="card" id="card-conversion" hidden>
       <h2>Phase 3 · Token conversion</h2>
       <p>Your <span id="conv-points">0</span> points become</p>
       <p class="big" id="conv-tokens">0 ELYX</p>
       <p class="muted" id="conv-rate"></p>
     </section>
 
-    <section id="card-airdrop" class="card" hidden>
+    <section class="card" id="card-airdrop" hidden>
       <h2>Phase 4 · Airdrop</h2>
       <p class="big" id="airdrop-tokens">0 ELYX</p>
       <p id="airdrop-status" class="muted"></p>

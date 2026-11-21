@@ -33,8 +33,19 @@ function markDone(id) {
   li.classList.add("done");
 }
 
+function renderPhaseSteps(phase) {
+  const el = document.getElementById("phase-steps");
+  el.innerHTML = "";
+  for (let i = 1; i <= 4; i++) {
+    const d = document.createElement("span");
+    d.className = "dot" + (i <= phase ? " on" : "");
+    el.appendChild(d);
+  }
+}
+
 function render() {
   document.getElementById("title").textContent = `${profile.token_name} Airdrop`;
+  renderPhaseSteps(profile.phase);
   if (profile.is_admin) document.getElementById("admin-link").hidden = false;
   document.getElementById("phase-banner").textContent =
     `Phase ${profile.phase} of 4 · ${profile.phase_name}`;
@@ -182,7 +193,22 @@ tonConnectUI.onStatusChange(async (wallet) => {
   }
 });
 
+const DEMO = new URLSearchParams(location.search).get("demo") === "1";
+
 (async () => {
+  if (DEMO) {
+    profile = {
+      token_name: "ELYX", phase: 2, phase_name: "Points collection",
+      points_per_token: 1, whitelisted: true, tokens: 320, is_admin: true,
+      channel: "@elyx", channel_url: "https://t.me/elyx", group: null, group_url: null,
+      x_url: "https://x.com/your_handle", points_per_referral: 10,
+      joined_channel: true, followed_x: false, wallet: null, points: 320,
+      referrals: 7, bot_username: "Elyvxbot",
+    };
+    render();
+    document.getElementById("ref-link").value = "https://t.me/Elyvxbot?start=ref_7082457308";
+    return;
+  }
   try {
     profile = await api("/api/register", "POST");
     render();

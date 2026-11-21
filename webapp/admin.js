@@ -123,7 +123,33 @@ document.getElementById("export").addEventListener("click", async () => {
   }
 });
 
+const DEMO = new URLSearchParams(location.search).get("demo") === "1";
+
 (async () => {
+  if (DEMO) {
+    document.getElementById("panel").hidden = false;
+    document.getElementById("phase-banner").textContent = "Phase 2 of 4 · Points collection";
+    document.getElementById("st-total").textContent = "1,284";
+    document.getElementById("st-whitelisted").textContent = "962";
+    document.getElementById("st-wallets").textContent = "731";
+    document.getElementById("st-referred").textContent = "408";
+    document.querySelectorAll(".phase-btn").forEach((b) => {
+      b.classList.toggle("active", Number(b.dataset.phase) === 2);
+    });
+    const wl = document.querySelector("#whitelist-table tbody");
+    [["Omar", "omar_x"], ["Mariam", "mariam.eg"]].forEach(([n, u]) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${n} <span class="muted">@${u}</span></td><td><button class="btn small approve-btn" data-id="0">Approve</button></td>`;
+      wl.appendChild(tr);
+    });
+    const ut = document.querySelector("#users-table tbody");
+    [["Yehia", "elyxrex", 320, 320, "UQDMxfo…"], ["Omar", "omar_x", 240, 240, "—"], ["Mariam", "mariam.eg", 185, 185, "EQB7kLm…"]].forEach(([n, u, p, t, w]) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${n} <span class="muted">@${u}</span></td><td>${p}</td><td>${t}</td><td class="mono">${w}</td>`;
+      ut.appendChild(tr);
+    });
+    return;
+  }
   try {
     await loadOverview();
     document.getElementById("panel").hidden = false;
