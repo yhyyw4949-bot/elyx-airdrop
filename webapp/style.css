@@ -197,7 +197,7 @@ h2 {
   border: 1px solid var(--gold-dim);
 }
 
-input[readonly] {
+input[readonly], input:not([type]), input[type="number"], select, textarea {
   flex: 1;
   min-width: 0;
   background: rgba(255, 255, 255, 0.05);
@@ -205,6 +205,83 @@ input[readonly] {
   border-radius: 10px;
   color: inherit;
   padding: 9px 11px;
+  font: inherit;
+}
+
+textarea {
+  width: 100%;
+  resize: vertical;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.badge.pending { background: rgba(212, 175, 55, 0.16); color: var(--gold-bright); }
+.badge.approved { background: rgba(80, 200, 120, 0.16); color: #7be39b; }
+.badge.completed { background: rgba(80, 200, 120, 0.16); color: #7be39b; }
+.badge.rejected, .badge.cancelled { background: rgba(220, 90, 90, 0.16); color: #f08a8a; }
+
+.btn.danger {
+  background: rgba(220, 90, 90, 0.14);
+  color: #f08a8a;
+  border: 1px solid rgba(220, 90, 90, 0.4);
+}
+
+.leaderboard {
+  margin-top: 12px;
+}
+
+.leaderboard h3, .card h3 {
+  font-size: 0.95rem;
+  margin: 10px 0 6px;
+}
+
+.wd-list {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wd-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.task-admin-row {
+  justify-content: space-between;
+}
+
+.view-toggle {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.view-btn {
+  opacity: 0.6;
+}
+
+.view-btn.active {
+  opacity: 1;
+  border: 1px solid var(--gold);
 }
 
 .done .task-body strong {

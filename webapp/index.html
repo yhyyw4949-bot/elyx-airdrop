@@ -13,88 +13,199 @@
     <header class="brand">
       <span class="mark">E</span>
       <h1 id="title">ELYX Airdrop</h1>
-      <p class="tagline">Complete the tasks to qualify, then invite friends for points.</p>
+      <p class="tagline" id="tagline">Complete the tasks to qualify, then invite friends for points.</p>
       <div class="phase-banner-wrap">
         <span id="phase-banner" class="phase-banner"></span>
       </div>
       <div id="phase-steps" class="phase-steps"></div>
+      <div id="view-toggle" class="view-toggle" hidden>
+        <button class="btn small view-btn active" data-view="app">Airdrop</button>
+        <button class="btn small view-btn" data-view="admin">Admin</button>
+      </div>
     </header>
 
-    <section class="card" id="card-whitelist" hidden>
-      <h2>Phase 1 · Whitelist</h2>
-      <p id="whitelist-status" class="muted"></p>
-    </section>
+    <div id="view-app">
+      <section class="card" id="card-whitelist" hidden>
+        <h2>Phase 1 · Whitelist</h2>
+        <p id="whitelist-status" class="muted"></p>
+      </section>
 
-    <section class="card" id="card-tasks" hidden>
-      <h2>Phase 2 · Earn points</h2>
-      <p id="tasks-locked" class="muted" hidden>This phase is for whitelist members only.</p>
-      <ul class="tasks" id="tasks-list">
-        <li id="task-channel">
-          <span class="check">⬜</span>
-          <div class="task-body">
-            <strong>Join the Telegram channel</strong>
-            <div class="row">
-              <a id="channel-link" class="btn small" target="_blank">Open channel</a>
-              <button id="verify-channel" class="btn small primary">Verify</button>
-            </div>
+      <section class="card" id="card-tasks" hidden>
+        <h2>Phase 2 · Earn points</h2>
+        <p id="tasks-locked" class="muted" hidden>This phase is for whitelist members only.</p>
+        <ul class="tasks" id="tasks-list"></ul>
+      </section>
+
+      <section class="card" id="card-referrals" hidden>
+        <h2>Your referrals</h2>
+        <p><span id="points">0</span> points · <span id="referrals">0</span> referrals</p>
+        <div class="row">
+          <input id="ref-link" class="mono" readonly />
+          <button id="copy-ref" class="btn small">Copy</button>
+        </div>
+        <p class="muted" id="ref-hint"></p>
+        <div id="leaderboard" class="leaderboard" hidden>
+          <h3>Top referrers</h3>
+          <ol id="leaderboard-list"></ol>
+        </div>
+      </section>
+
+      <section class="card" id="card-conversion" hidden>
+        <h2>Phase 3 · Token conversion</h2>
+        <p>Your <span id="conv-points">0</span> points become</p>
+        <p class="big" id="conv-tokens">0 ELYX</p>
+        <p class="muted" id="conv-rate"></p>
+      </section>
+
+      <section class="card" id="card-airdrop" hidden>
+        <h2>Phase 4 · Airdrop</h2>
+        <p class="big" id="airdrop-tokens">0 ELYX</p>
+        <p id="airdrop-status" class="muted"></p>
+      </section>
+
+      <section class="card" id="card-withdraw" hidden>
+        <h2>Withdraw</h2>
+        <p class="muted">Minimum <span id="wd-min">0</span> ELYX ·
+          available <span id="wd-available">0</span> ELYX</p>
+        <div class="stack">
+          <input id="wd-amount" class="mono" type="number" min="1" placeholder="Amount (ELYX)" />
+          <input id="wd-wallet" class="mono" placeholder="Your TON wallet address" />
+          <button id="wd-submit" class="btn primary">Request withdrawal</button>
+        </div>
+        <div id="wd-list" class="wd-list"></div>
+      </section>
+    </div>
+
+    <div id="view-admin" hidden>
+      <section class="card">
+        <h2>Stats</h2>
+        <div class="stat-grid">
+          <div class="stat"><span id="st-total">0</span><label>users</label></div>
+          <div class="stat"><span id="st-whitelisted">0</span><label>whitelisted</label></div>
+          <div class="stat"><span id="st-wallets">0</span><label>wallets</label></div>
+          <div class="stat"><span id="st-referred">0</span><label>via referral</label></div>
+          <div class="stat"><span id="st-banned">0</span><label>banned</label></div>
+          <div class="stat"><span id="st-pending-wd">0</span><label>pending withdrawals</label></div>
+          <div class="stat"><span id="st-completed-wd">0</span><label>paid withdrawals</label></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Campaign phase</h2>
+        <div class="phase-buttons">
+          <button class="btn small phase-btn" data-phase="1">1 Whitelist</button>
+          <button class="btn small phase-btn" data-phase="2">2 Points</button>
+          <button class="btn small phase-btn" data-phase="3">3 Conversion</button>
+          <button class="btn small phase-btn" data-phase="4">4 Airdrop</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Whitelist requests</h2>
+        <div class="row">
+          <button id="approve-all" class="btn small primary">Approve all</button>
+          <button id="refresh-wl" class="btn small">Refresh</button>
+        </div>
+        <table id="whitelist-table">
+          <thead><tr><th>User</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <p id="whitelist-empty" class="muted" hidden>No pending requests.</p>
+      </section>
+
+      <section class="card">
+        <h2>Withdrawals</h2>
+        <div class="row">
+          <select id="wd-filter">
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="completed">Completed</option>
+            <option value="rejected">Rejected</option>
+            <option value="">All</option>
+          </select>
+          <button id="refresh-wd" class="btn small">Refresh</button>
+        </div>
+        <div class="table-wrap">
+          <table id="wd-table">
+            <thead><tr><th>User</th><th>Amount</th><th>Wallet</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p id="wd-empty" class="muted" hidden>No withdrawals here.</p>
+      </section>
+
+      <section class="card">
+        <h2>Members</h2>
+        <div class="row">
+          <input id="user-search" placeholder="Search name, @user or ID" />
+          <button id="search-btn" class="btn small">Search</button>
+        </div>
+        <div class="row">
+          <button id="export" class="btn small primary">Export CSV</button>
+          <button id="refresh-users" class="btn small">Refresh</button>
+        </div>
+        <div class="table-wrap">
+          <table id="users-table">
+            <thead><tr><th>User</th><th>Points</th><th>ELYX</th><th>Wallet</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Tasks</h2>
+        <div id="tasks-admin"></div>
+        <h3>Add / edit task</h3>
+        <div class="stack">
+          <input type="hidden" id="task-id" />
+          <input id="task-key" class="mono" placeholder="key (e.g. youtube)" />
+          <input id="task-title" placeholder="Title" />
+          <div class="row">
+            <select id="task-kind">
+              <option value="channel">Telegram join</option>
+              <option value="x">X follow</option>
+              <option value="wallet">Wallet connect</option>
+              <option value="custom">Custom</option>
+            </select>
+            <select id="task-verification">
+              <option value="confirm">Manual confirm</option>
+              <option value="channel">Telegram verify</option>
+              <option value="x_api">X API verify</option>
+              <option value="wallet">Wallet verify</option>
+            </select>
           </div>
-        </li>
-        <li id="task-group" hidden>
-          <span class="check">⬜</span>
-          <div class="task-body">
-            <strong>Join the Telegram group</strong>
-            <div class="row">
-              <a id="group-link" class="btn small" target="_blank">Open group</a>
-            </div>
+          <input id="task-url" class="mono" placeholder="URL (optional)" />
+          <div class="row">
+            <input id="task-points" type="number" min="0" placeholder="Points" />
+            <input id="task-max" type="number" min="1" placeholder="Max participants (optional)" />
+            <input id="task-order" type="number" placeholder="Order" />
           </div>
-        </li>
-        <li id="task-x">
-          <span class="check">⬜</span>
-          <div class="task-body">
-            <strong>Follow us on X</strong>
-            <div class="row">
-              <a id="x-link" class="btn small" target="_blank">Open X</a>
-              <button id="confirm-x" class="btn small primary">I followed</button>
-            </div>
-          </div>
-        </li>
-        <li id="task-wallet">
-          <span class="check">⬜</span>
-          <div class="task-body">
-            <strong>Connect your TON wallet</strong>
-            <div id="ton-connect"></div>
-            <p id="wallet-address" class="muted mono" hidden></p>
-          </div>
-        </li>
-      </ul>
-    </section>
+          <button id="task-save" class="btn small primary">Save task</button>
+        </div>
+      </section>
 
-    <section class="card" id="card-referrals" hidden>
-      <h2>Your referrals</h2>
-      <p><span id="points">0</span> points · <span id="referrals">0</span> referrals</p>
-      <div class="row">
-        <input id="ref-link" class="mono" readonly />
-        <button id="copy-ref" class="btn small">Copy</button>
-      </div>
-      <p class="muted" id="ref-hint"></p>
-    </section>
+      <section class="card">
+        <h2>Broadcast</h2>
+        <div class="stack">
+          <textarea id="broadcast-text" rows="3" placeholder="Announcement for all users"></textarea>
+          <button id="broadcast-send" class="btn small primary">Send broadcast</button>
+        </div>
+      </section>
 
-    <section class="card" id="card-conversion" hidden>
-      <h2>Phase 3 · Token conversion</h2>
-      <p>Your <span id="conv-points">0</span> points become</p>
-      <p class="big" id="conv-tokens">0 ELYX</p>
-      <p class="muted" id="conv-rate"></p>
-    </section>
+      <section class="card">
+        <h2>Admin activity</h2>
+        <div class="table-wrap">
+          <table id="audit-table">
+            <thead><tr><th>When</th><th>Action</th><th>Details</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
 
-    <section class="card" id="card-airdrop" hidden>
-      <h2>Phase 4 · Airdrop</h2>
-      <p class="big" id="airdrop-tokens">0 ELYX</p>
-      <p id="airdrop-status" class="muted"></p>
-    </section>
-
-    <a id="admin-link" class="admin-link" href="/admin.html" hidden>Admin panel</a>
     <p id="toast" class="toast" hidden></p>
   </main>
   <script src="app.js"></script>
+  <script src="admin.js"></script>
 </body>
 </html>
