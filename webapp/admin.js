@@ -296,7 +296,6 @@ async function loadOverview() {
 
   if (demo) {
 
-    document.getElementById("panel").hidden = false;
     document.getElementById("phase-banner").textContent = "Phase 2 of 4 · Points collection";
     document.getElementById("st-total").textContent = "1,284";
     document.getElementById("st-whitelisted").textContent = "962";
